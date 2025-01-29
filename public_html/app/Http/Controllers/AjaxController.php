@@ -681,11 +681,11 @@ class AjaxController extends Controller
             $cond .= ' LIMIT 12';
 
         if ($pagina != 1)
-            $cond .= ' LIMIT 12 OFFSET ' . (($pagina * 12)- 1);
+            $cond .= ' LIMIT 12 OFFSET ' . (($pagina * 12) - 1);
 
 
         if (substr($utente->cd_cf, 0, 1) == 'F') {
-            $query = 'SELECT ar.cd_arprdclasse,(SELECT COALESCE(umfatt,0) from ararmisura where id_ditta = 5 and cd_ar = ar.cd_ar and cd_armisura = \'in\' LIMIT 1) as inner_misura,ar.cd_arclasse1,ar.cd_arclasse2,ar.cd_arclasse3,ar.cd_ar,ar.descrizione,lsarticolo.prezzo,(Select link from arimg where id_ditta = ' . $utente->id_ditta . '  and cd_ar = ar.cd_ar and Riga = 1 LIMIT 1  ) as immagine, ar.id , lsarticolo.sconto, ar.xqtaconf , COALESCE(mggiacenza.giacenza,0.00) as giacenza , COALESCE(mggiacenza.ordinato,0.00) as ordinato, COALESCE(mggiacenza.disponibile,0.00) as disponibile
+            $query = 'SELECT ar.id_ar,ar.cd_arprdclasse,(SELECT COALESCE(umfatt,0) from ararmisura where id_ditta = 5 and cd_ar = ar.cd_ar and cd_armisura = \'in\' LIMIT 1) as inner_misura,ar.cd_arclasse1,ar.cd_arclasse2,ar.cd_arclasse3,ar.cd_ar,ar.descrizione,lsarticolo.prezzo,(Select link from arimg where id_ditta = ' . $utente->id_ditta . '  and cd_ar = ar.cd_ar and Riga = 1 LIMIT 1  ) as immagine, ar.id , lsarticolo.sconto, ar.xqtaconf , COALESCE(mggiacenza.giacenza,0.00) as giacenza ,COALESCE(mggiacenza.giacenza - mggiacenza.impegnato,0.00) as immediato , COALESCE(mggiacenza.ordinato,0.00) as ordinato,if((mggiacenza.Giacenza - mggiacenza.Impegnato) > 0, mggiacenza.Disponibile - mggiacenza.Giacenza, mggiacenza.Ordinato + (mggiacenza.Giacenza - mggiacenza.Impegnato)) as bollino_blu, COALESCE(mggiacenza.disponibile,0.00) as disponibile
         FROM ar  
         ' . $aralias . ' ' . $armarca . '
         LEFT JOIN mggiacenza on mggiacenza.cd_ar = ar.cd_ar and mggiacenza.cd_mg = \'00001\' and mggiacenza.id_ditta = ' . $utente->id_ditta . ' 
@@ -693,38 +693,15 @@ class AjaxController extends Controller
         LEFT JOIN lsrevisione ON lsrevisione.id_lsrevisione = lsarticolo.id_lsrevisione AND lsrevisione.id_ditta = ' . $utente->id_ditta . '
         JOIN cf ON cf.cd_ls_1 = lsrevisione.cd_ls AND cf.cd_cf = \'C000001\' and cf.id_ditta = ' . $utente->id_ditta . ' ' . $cond;
         } else {
-            $query = 'SELECT ar.cd_arprdclasse,(SELECT COALESCE(umfatt,0) from ararmisura where id_ditta = 5 and cd_ar = ar.cd_ar and cd_armisura = \'in\' LIMIT 1) as inner_misura,ar.cd_arclasse1,ar.cd_arclasse2,ar.cd_arclasse3,ar.cd_ar,ar.descrizione,lsarticolo.prezzo,(Select link from arimg where id_ditta = ' . $utente->id_ditta . '  and cd_ar = ar.cd_ar and Riga = 1 LIMIT 1  ) as immagine, ar.id , lsarticolo.sconto, ar.xqtaconf , COALESCE(mggiacenza.giacenza,0.00) as giacenza , COALESCE(mggiacenza.ordinato,0.00) as ordinato, COALESCE(mggiacenza.disponibile,0.00) as disponibile
+            $query = 'SELECT ar.id_ar,ar.cd_arprdclasse,(SELECT COALESCE(umfatt,0) from ararmisura where id_ditta = 5 and cd_ar = ar.cd_ar and cd_armisura = \'in\' LIMIT 1) as inner_misura,ar.cd_arclasse1,ar.cd_arclasse2,ar.cd_arclasse3,ar.cd_ar,ar.descrizione,lsarticolo.prezzo,(Select link from arimg where id_ditta = ' . $utente->id_ditta . '  and cd_ar = ar.cd_ar and Riga = 1 LIMIT 1  ) as immagine, ar.id , lsarticolo.sconto, ar.xqtaconf , COALESCE(mggiacenza.giacenza,0.00) as giacenza ,COALESCE(mggiacenza.giacenza - mggiacenza.impegnato,0.00) as immediato , COALESCE(mggiacenza.ordinato,0.00) as ordinato,if((mggiacenza.Giacenza - mggiacenza.Impegnato) > 0, mggiacenza.Disponibile - mggiacenza.Giacenza, mggiacenza.Ordinato + (mggiacenza.Giacenza - mggiacenza.Impegnato)) as bollino_blu, COALESCE(mggiacenza.disponibile,0.00) as disponibile
         FROM ar  
         ' . $aralias . ' ' . $armarca . '
         LEFT JOIN mggiacenza on mggiacenza.cd_ar = ar.cd_ar and mggiacenza.cd_mg = \'00001\' and mggiacenza.id_ditta = ' . $utente->id_ditta . ' 
         LEFT JOIN lsarticolo ON lsarticolo.cd_ar = ar.cd_ar and lsarticolo.id_ditta = ' . $utente->id_ditta . '
         LEFT JOIN lsrevisione ON lsrevisione.id_lsrevisione = lsarticolo.id_lsrevisione AND lsrevisione.id_ditta = ' . $utente->id_ditta . '
-        JOIN cf ON cf.cd_ls_1 = lsrevisione.cd_ls AND cf.cd_cf = \''.$utente->cd_cf .'\' and cf.id_ditta = ' . $utente->id_ditta . ' ' . $cond;
+        JOIN cf ON cf.cd_ls_1 = lsrevisione.cd_ls AND cf.cd_cf = \'' . $utente->cd_cf . '\' and cf.id_ditta = ' . $utente->id_ditta . ' ' . $cond;
 
         }
-
-
-        /*echo 'SELECT ar.cd_arprdclasse,(SELECT COALESCE(umfatt,0) from ararmisura where id_ditta = 5 and cd_ar = ar.cd_ar and cd_armisura = \'in\' LIMIT 1) as inner_misura,ar.cd_arclasse1,ar.cd_arclasse2,ar.cd_arclasse3,ar.cd_ar,ar.descrizione,lsarticolo.prezzo,(Select link from arimg where id_ditta = ' . $utente->id_ditta . '  and cd_ar = ar.cd_ar and Riga = 1 LIMIT 1  ) as immagine, ar.id , lsarticolo.sconto, ar.xqtaconf , COALESCE(mggiacenza.giacenza,0.00) as giacenza , COALESCE(mggiacenza.ordinato,0.00) as ordinato, COALESCE(mggiacenza.disponibile,0.00) as disponibile
-        FROM ar  
-        ' . $aralias .' '. $armarca . '
-        LEFT JOIN mggiacenza on mggiacenza.cd_ar = ar.cd_ar and mggiacenza.cd_mg = \'00001\' and mggiacenza.id_ditta = ' . $utente->id_ditta . ' 
-        LEFT JOIN lsarticolo ON lsarticolo.cd_ar = ar.cd_ar and lsarticolo.id_ditta = ' . $utente->id_ditta . '
-        LEFT JOIN lsrevisione ON lsrevisione.id_lsrevisione = lsarticolo.id_lsrevisione AND lsrevisione.id_ditta = ' . $utente->id_ditta . '
-        JOIN cf ON cf.cd_ls_1 = lsrevisione.cd_ls AND cf.cd_cf = \'' . $utente->cd_cf . '\' and cf.id_ditta = ' . $utente->id_ditta . ' ' . $cond;
-        /*
-
-CREATE INDEX IX_CF_Ditta ON cf (Cd_CF, id_ditta)
-CREATE INDEX IX_LSRevisione_Ditta ON lsrevisione (Cd_LS, id_ditta);
-CREATE INDEX IX_LSArticolo_Ditta ON lsarticolo (Cd_AR, id_lsrevisione, id_ditta);
-CREATE INDEX IX_MGGiacenza_Ditta ON mggiacenza (Cd_AR, id_ditta);
-CREATE INDEX IX_ARMARCA_Ditta ON armarca (cd_armarca, id_ditta);
-CREATE INDEX IX_ARAlias_Ditta ON aralias (Cd_AR, id_ditta);
-CREATE INDEX IX_AR_Ditta ON ar (id_ditta)
-
-
-
-        */
-
         $articoli = DB::SELECT($query);
 
         $count = sizeof($articoli);
@@ -756,8 +733,9 @@ CREATE INDEX IX_AR_Ditta ON ar (id_ditta)
                                          echo $immagine;
                                      } else echo URL::ASSET("/img/" . $ditta . "/no_logo_" . "$ditta" . ".png ") ?>);background-size:contain!important">
                                     <ul class="product__hover">
-                                        <li><a href="./dettaglio/<?php echo $a->id ?>"><img src="/img/icon/search.png"
-                                                                                            alt=""></a></li>
+                                        <li><a href="./dettaglio/<?php echo $a->id_ar ?>"><img
+                                                        src="/img/icon/search.png"
+                                                        alt=""></a></li>
                                     </ul>
                                 </div>
                                 <div class="product__item__text">
@@ -782,14 +760,15 @@ CREATE INDEX IX_AR_Ditta ON ar (id_ditta)
                                            style="width: 20%;text-align: center"
                                            class="add-cart"
                                            onchange="check(<?php echo $a->id ?>, <?php echo $a->xqtaconf; ?>, <?php echo $a->disponibile; ?>);"
-                                           value="<?php /* echo ($a->disponibile > $a->xqtaconf) ? ($a->xqtaconf != '0.00') ? intval($a->xqtaconf) : '1' : '0' */?>0"
+                                           value="<?php /* echo ($a->disponibile > $a->xqtaconf) ? ($a->xqtaconf != '0.00') ? intval($a->xqtaconf) : '1' : '0' */ ?>0"
                                            step="<?php echo ($a->xqtaconf != '0.00') ? intval($a->xqtaconf) : '1' ?>">
                                     <button type="button" style="border:none;background: transparent"
                                             onclick="aumenta('<?php echo $a->id ?>','<?php echo ($a->xqtaconf != '0.00') ? intval($a->xqtaconf) : '1' ?>','<?php echo $a->disponibile ?>')"
                                             id="aumenta_<?php echo $a->id ?>" class="add-cart"><i
                                                 class="fa fa-solid fa-plus"
                                                 style="background-color:white;border:none"> </i></button>
-                                    <i class="fa fa-solid fa-shopping-cart" style="background-color:white;border:none"></i>
+                                    <i class="fa fa-solid fa-shopping-cart"
+                                       style="background-color:white;border:none"></i>
                                     <button type="button" style="width:30%;border:none;background: transparent"
                                             onclick="aggiungi('<?php echo $a->id ?>')"
                                             id="aggiungi_<?php echo $a->id ?>" class="add-cart">
@@ -807,12 +786,14 @@ CREATE INDEX IX_AR_Ditta ON ar (id_ditta)
 -->*/ ?>
                                     <div style="text-align: center;display: flex;gap:3%">
                                         <div class="red" <?php
-                                        if ($a->disponibile >= 16) echo 'style="background: green;"';
-                                        if ($a->disponibile > 0 && $a->disponibile <= 15) echo 'style="background: yellow;"';
-                                        if ($a->disponibile <= 0 && $a->ordinato <= 0) echo 'style=""';
-                                        if ($a->disponibile <= 0 && $a->ordinato > 0) echo 'style="background: yellow;"';
+                                        if ($a->immediato >= 16) echo 'style="background: green;"';
+                                        if ($a->immediato > 0 && $a->immediato <= 15) echo 'style="background: yellow;"';
+                                        if ($a->immediato <= 0) echo 'style=""';/*
+                                        if ($a->disponibile <= 0 && $a->ordinato > 0) echo 'style="background: yellow;"';*/
                                         ?>></div>
                                         <h7><?php echo $a->cd_ar ?></h7>
+                                        <div class="red"
+                                             style="<?php if ($a->bollino_blu > 0) echo 'background: blue'; else echo 'display:none;'; ?>"></div>
                                     </div>
                                     <h6><?php echo $a->descrizione ?></h6>
                                     <!--<div class="rating">
@@ -829,17 +810,7 @@ CREATE INDEX IX_AR_Ditta ON ar (id_ditta)
                                         echo number_format($a->prezzo - ($a->prezzo / 100) * $a->sconto, 2, ',', '') ?></h5>
                                 <span class="sconto"><?php echo number_format($a->prezzo, '2', ',', ''); ?>
                                 €</span><?php } ?>
-                                    <!--<div class="product__color__select">
-                                        <label for="pc-4">
-                                            <input type="radio" id="pc-4">
-                                        </label>
-                                        <label class="active black" for="pc-5">
-                                            <input type="radio" id="pc-5">
-                                        </label>
-                                        <label class="grey" for="pc-6">
-                                            <input type="radio" id="pc-6">
-                                        </label>
-                                    </div>-->
+
                                 </div>
                             </div>
                         </form>

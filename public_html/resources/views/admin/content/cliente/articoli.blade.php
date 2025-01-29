@@ -243,13 +243,16 @@
                                      style="gap:1em;justify-content: center;align-items: center;display: flex;position: sticky;left: 0;top:15%;flex-direction: column;z-index: 10;text-align: center">
 
                                     <div class="red" style="margin-left:1%;margin-right:5%;"></div>
-                                    <a style="font-weight: bolder">Merce non Disponibile (da 0 a 2) </a>
+                                    <a style="font-weight: bolder">Merce Immediata non Disponibile (da 0 a 2) </a>
 
                                     <div class="red" style="margin-left:1%;background: yellow;margin-right:5%;"></div>
-                                    <a style="font-weight: bolder">Merce in Esaurimento (da 3 a 15) </a>
+                                    <a style="font-weight: bolder">Merce Immediata in Esaurimento (da 3 a 15) </a>
 
                                     <div class="red" style="margin-left:1%;background: green;margin-right:5%;"></div>
-                                    <a style="font-weight: bolder">Merce Disponibile (+16) </a>
+                                    <a style="font-weight: bolder">Merce Immediata Disponibile (+16) </a>
+
+                                    <div class="red" style="margin-left:1%;background: blue;margin-right:5%;"></div>
+                                    <a style="font-weight: bolder">Merce Ordinabile </a>
                                 </div>
                             </div>
                         </div>
@@ -274,11 +277,13 @@
             <div class="col-lg-1 cellulare">
                 <div style="gap:1em;justify-content: center;align-items: center;display: flex;position: sticky;left: 0;top:15%;flex-direction: column;z-index: 10;text-align: center">
                     <div class="red" style="margin-left:1%;margin-right:5%;"></div>
-                    <a style="font-weight: bolder">Merce non Disponibile (da 0 a 2)</a>
+                    <a style="font-weight: bolder">Merce Immediata non Disponibile (da 0 a 2)</a>
                     <div class="red" style="margin-left:1%;background: yellow;margin-right:5%;"></div>
-                    <a style="font-weight: bolder">Merce in Esaurimento (da 3 a 15) </a>
+                    <a style="font-weight: bolder">Merce Immediata in Esaurimento (da 3 a 15) </a>
                     <div class="red" style="margin-left:1%;background: green;margin-right:5%;"></div>
-                    <a style="font-weight: bolder">Merce Disponibile (+16)</a>
+                    <a style="font-weight: bolder">Merce Immediata Disponibile (+16)</a>
+                    <div class="red" style="margin-left:1%;background: blue;margin-right:5%;"></div>
+                    <a style="font-weight: bolder">Merce Ordinabile </a>
                 </div>
             </div>
         </div>

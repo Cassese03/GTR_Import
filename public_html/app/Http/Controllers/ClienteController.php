@@ -591,12 +591,12 @@ class ClienteController extends Controller
 
             }
 
-            return Redirect::to('/cliente/dettaglio/' . $prodotti[0]->id . '?aggiunto=1');
+            return Redirect::to('/cliente/dettaglio/' . $prodotti[0]->id_ar . '?aggiunto=1');
         }
 
         $page = 'cliente.dettaglio';
 
-        $articolo = DB::SELECT('SELECT *, (SELECT alias from aralias where cd_ar = ar.cd_ar and id_ditta = ' . $utente->id_ditta . ' LIMIT 1) as barcode FROM ar where id_ditta = ' . $utente->id_ditta . ' and id = \'' . $articolo . '\' ');
+        $articolo = DB::SELECT('SELECT *, (SELECT alias from aralias where cd_ar = ar.cd_ar and id_ditta = ' . $utente->id_ditta . ' LIMIT 1) as barcode FROM ar where id_ditta = ' . $utente->id_ditta . ' and id_ar = \'' . $articolo . '\' ');
 
         if (sizeof($articolo) > 0)
             $articolo = $articolo[0];
@@ -618,7 +618,7 @@ class ClienteController extends Controller
         if ($articolo->cd_arclasse3 != '')
             $cond .= ' and cd_arclasse3 = \'' . $articolo->cd_arclasse3 . '\' ';
 
-        $simili = DB::SELECT('SELECT ar.cd_ar,ar.descrizione,lsarticolo.prezzo, ar.immagine, ar.id , ar.xqtaconf
+        $simili = DB::SELECT('SELECT ar.id_ar,ar.cd_ar,ar.descrizione,lsarticolo.prezzo, ar.immagine, ar.id , ar.xqtaconf
                         FROM ar 
                         INNER JOIN lsrevisione ON lsrevisione.cd_ls = (SELECT cd_ls_1 FROM cf WHERE cd_cf  = \'' . $utente->cd_cf . '\' AND id_ditta = \'' . $utente->id_ditta . '\' ) AND lsrevisione.id_ditta = \'' . $utente->id_ditta . '\'
                         INNER JOIN lsarticolo ON lsarticolo.cd_ar = ar.cd_ar AND lsarticolo.id_ditta =\'' . $utente->id_ditta . '\' AND lsarticolo.id_lsrevisione = lsrevisione.id_lsrevisione
@@ -649,6 +649,18 @@ class ClienteController extends Controller
         else
             $disponibile = 0.00;
 
+        $bollino_blu = DB::SELECT('SELECT if((Giacenza - Impegnato) > 0, Disponibile - Giacenza, Ordinato + (Giacenza - Impegnato)) as Disponibile FROM mggiacenza where cd_ar = \'' . $articolo->cd_ar . '\' and cd_mg = \'00001\' and id_ditta = \'' . $utente->id_ditta . '\' ');
+        if (sizeof($bollino_blu) > 0)
+            $bollino_blu = $bollino_blu[0]->Disponibile;
+        else
+            $bollino_blu = 0.00;
+
+        $immediato = DB::SELECT('SELECT (Giacenza - Impegnato) as Immediato FROM mggiacenza where cd_ar = \'' . $articolo->cd_ar . '\' and cd_mg = \'00001\' and id_ditta = \'' . $utente->id_ditta . '\' ');
+        if (sizeof($immediato) > 0)
+            $immediato = $immediato[0]->Immediato;
+        else
+            $immediato = 0.00;
+
         $ordinato = DB::SELECT('SELECT Ordinato FROM ar where cd_ar = \'' . $articolo->cd_ar . '\' and id_ditta = \'' . $utente->id_ditta . '\' ')[0]->Ordinato;
 
         $immagine = DB::SELECT('SELECT * FROM arimg where id_ditta = ' . $utente->id_ditta . ' and cd_ar = \'' . $articolo->cd_ar . '\' order by riga asc');
@@ -657,7 +669,7 @@ class ClienteController extends Controller
 
         $count_img = sizeof($immagine);
 
-        return View::make('admin.index', compact('page', 'articolo', 'prezzo', 'simili', 'scheda_tec', 'scheda_web', 'utente', 'ordinato', 'giacenza', 'disponibile', 'immagine', 'ditta', 'count_img'));
+        return View::make('admin.index', compact('page', 'articolo', 'prezzo', 'bollino_blu', 'immediato', 'simili', 'scheda_tec', 'scheda_web', 'utente', 'ordinato', 'giacenza', 'disponibile', 'immagine', 'ditta', 'count_img'));
 
     }
 
@@ -1256,8 +1268,11 @@ class ClienteController extends Controller
 
                     $insert['cd_aliquota'] = DB::SELECT('SELECT * FROM aliquota WHERE aliquota = 22 and id_ditta = \'' . $utente->id_ditta . '\'')[0]->cd_aliquota;
                     $insert['cd_cfsede'] = '';
-                    $insert['cd_cfdest'] = '';
-                    $insert['cd_agente_1'] = '';
+                    $agente = DB::SELECT('SELECT * FROM cf WHERE cd_cf = \'' . $utente->cd_cf . '\' and id_ditta = \'' . $utente->id_ditta . '\'');
+                    if (sizeof($agente) > 0)
+                        $insert['cd_agente_1'] = $agente[0]->cd_agente_1;
+                    else
+                        $insert['cd_agente_1'] = '';
                     $insert['xcolli'] = '';
                     $insert['xbancali'] = '';
                     $insert['note'] = ($c['note']) ? $c['note'] : '';
@@ -1453,7 +1468,7 @@ class ClienteController extends Controller
         if (sizeof($giacenze) > 0) {
             $data = $giacenze;
             foreach ($data as $row) {
-                $row2[] = array(strval($row->cd_ar), strval($row->giacenza), strval($row->disponibile),  strval($row->immediato), strval($row->descrizione), strval($row->prezzo), strval($row->barcode), strval($row->copertina));
+                $row2[] = array(strval($row->cd_ar), strval($row->giacenza), strval($row->disponibile), strval($row->immediato), strval($row->descrizione), strval($row->prezzo), strval($row->barcode), strval($row->copertina));
             }
             return Excel::download(new ExcelExport($row2), 'ftp_' . $cd_cf . '.csv');
         }

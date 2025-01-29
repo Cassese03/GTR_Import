@@ -336,11 +336,37 @@
                     <div class="product__details__text">
                         <h4><?php echo $articolo->cd_ar; ?></h4>
                         <div class="red"
-                             style="margin-left:48%;<?php  if($disponibile > 50) echo 'background: green';if($disponibile < 50 && $disponibile > 0) echo 'background: yellow';?>">
+                             style="margin-left:48%;
+
+                 <?php
+                                        if ($immediato >= 16) echo 'style="background: green;"';
+                                        if ($immediato > 0 && $immediato <= 15) echo 'style="background: yellow;"';
+                                        if ($immediato <= 0) echo 'style=""';/*
+                                        if ($immediato <= 0 && $a->ordinato > 0) echo 'style="background: yellow;"';*/
+                                        ?>">
                             <br></div>
                         <div>
-                            <label style="color:black;font-weight: bold"><?php if ($disponibile > 15) echo 'Merce Disponibile'; if ($disponibile > 1 && $disponibile < 16) echo 'Merce in Esaurimento';if ($disponibile <= 0 && $ordinato <= 0) echo 'Merce Esaurita';if ($disponibile <= 0 && $ordinato > 0) echo 'Merce in Arrivo'; ?></label>
-                            <label style="color:black;font-weight: bold"><?php echo $disponibile ?></label>
+                            <label style="color:black;font-weight: bold">
+                                <?php if ($immediato > 15) echo 'Merce Immediata';
+                                if ($immediato > 1 && $immediato < 16) echo 'Merce Immediata in Esaurimento';
+                                if ($immediato <= 0) echo 'Merce Immediata Esaurita';/*
+                                      if ($immediato <= 0 && $ordinato > 0) echo 'Merce in Arrivo'; */ ?>
+
+                            </label>
+                            <label style="color:black;font-weight: bold">
+                                : <?php echo ($immediato <= 0) ? 0 : $immediato ?></label>
+                            <br>
+                            <div class="red"
+                                 style="margin-left:48%;
+
+                 <?php  if($bollino_blu > 0) echo 'background: blue'; else echo 'display:none;';?>">
+                                <br></div>
+                            <label style="color:black;font-weight: bold">
+                                <!-- DISPONIBILE MA NON IMMEDIATA -->
+                                <?php echo 'Merce in Arrivo'; ?>
+                            </label>
+                            <label style="color:black;font-weight: bold">
+                                : <?php echo ($bollino_blu <= 0) ? 0 : $bollino_blu; ?></label>
                         </div>
 
                         <!--<div class="rating">
@@ -405,9 +431,9 @@
                                     <button type="button" style="border:none;margin: 10px;background: transparent">
                                         <input type="hidden"
                                                step="<?php echo (number_format($articolo->xqtaconf,0)>0)? number_format($articolo->xqtaconf,0):1 ?>"
-                                               value="<?php  echo ($disponibile > number_format($articolo->xqtaconf,0)) ? (number_format($articolo->xqtaconf,0) != '0.00') ? number_format($articolo->xqtaconf,0) : '1' : '0'?>"
+                                               value="<?php  echo ($immediato > number_format($articolo->xqtaconf,0)) ? (number_format($articolo->xqtaconf,0) != '0.00') ? number_format($articolo->xqtaconf,0) : '1' : '0'?>"
                                                name="quantita" id="quantita">
-                                        <strong id="ciao"><?php echo ($disponibile > number_format($articolo->xqtaconf, 0)) ? (number_format($articolo->xqtaconf, 0) != '0.00') ? number_format($articolo->xqtaconf, 0) : '1' : '0' ?></strong>
+                                        <strong id="ciao"><?php echo ($immediato > number_format($articolo->xqtaconf, 0)) ? (number_format($articolo->xqtaconf, 0) != '0.00') ? number_format($articolo->xqtaconf, 0) : '1' : '0' ?></strong>
                                     </button>
                                     <button type="button" style="border:none;margin: 10px;background: transparent"
                                             onclick="aggiungi()">
@@ -566,14 +592,14 @@
                             <ul class="product__hover">
                                 <!--<li><a href="#"><img src="/img/icon/heart.png" alt=""></a></li>
                                 <li><a href="#"><img src="/img/icon/compare.png" alt=""> <span>Compare</span></a></li>-->
-                                <li><a href="/cliente/dettaglio/<?php echo $s->id ?>"><img src="/img/icon/search.png"
-                                                                                           alt=""></a></li>
+                                <li><a href="/cliente/dettaglio/<?php echo $s->id_ar ?>"><img src="/img/icon/search.png"
+                                                                                              alt=""></a></li>
                             </ul>
                         </div>
                         <div class="product__item__text" style="text-align: center">
                             <h6><?php echo $s->descrizione ?></h6>
                             <button type="submit" style="visibility: hidden!important;top: 22px!important;"
-                                    value="<?php echo ($disponibile > $s->xqtaconf) ? ($s->xqtaconf != '0.00') ? intval($s->xqtaconf) : '1' : '0'?>"
+                                    value="<?php echo ($immediato > $s->xqtaconf) ? ($s->xqtaconf != '0.00') ? intval($s->xqtaconf) : '1' : '0'?>"
                                     name="aggiungi_al_carrello">
                                 <a class="add-cart">+ Aggiungi al Carrello</a>
                             </button>
@@ -688,7 +714,7 @@
 
     function aggiungi() {
         quantita = document.getElementById('quantita').value;
-        if (parseInt(quantita) + parseInt(<?php echo (number_format($articolo->xqtaconf, 0)) ? number_format($articolo->xqtaconf, 0) : 1 ?>) <= '<?php echo $disponibile; ?>') {
+        if (parseInt(quantita) + parseInt(<?php echo (number_format($articolo->xqtaconf, 0)) ? number_format($articolo->xqtaconf, 0) : 1 ?>) <= '<?php echo $immediato; ?>') {
             document.getElementById('quantita').value = parseInt(quantita) + parseInt(<?php echo (number_format($articolo->xqtaconf, 0)) ? number_format($articolo->xqtaconf, 0) : 1 ?>);
             document.getElementById('ciao').innerHTML = document.getElementById('quantita').value;
         } else
