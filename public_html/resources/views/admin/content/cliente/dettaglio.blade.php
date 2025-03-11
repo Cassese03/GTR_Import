@@ -339,9 +339,9 @@
                              style="margin-left:48%;
 
                  <?php
-                                        if ($immediato >= 16) echo 'style="background: green;"';
-                                        if ($immediato > 0 && $immediato <= 15) echo 'style="background: yellow;"';
-                                        if ($immediato <= 0) echo 'style=""';/*
+                                        if ($immediato >= 16) echo 'background: green;';
+                                        if ($immediato > 0 && $immediato <= 15) echo 'background: yellow;';
+                                        if ($immediato <= 0) echo '';/*
                                         if ($immediato <= 0 && $a->ordinato > 0) echo 'style="background: yellow;"';*/
                                         ?>">
                             <br></div>
@@ -361,11 +361,11 @@
 
                  <?php  if($bollino_blu > 0) echo 'background: blue'; else echo 'display:none;';?>">
                                 <br></div>
-                            <label style="color:black;font-weight: bold">
+                            <label style="color:black;font-weight: bold;<?php  if($bollino_blu > 0) echo ''; else echo 'display:none;';?>">
                                 <!-- DISPONIBILE MA NON IMMEDIATA -->
                                 <?php echo 'Merce in Arrivo'; ?>
                             </label>
-                            <label style="color:black;font-weight: bold">
+                            <label style="color:black;font-weight: bold;<?php  if($bollino_blu > 0) echo ''; else echo 'display:none;';?>">
                                 : <?php echo ($bollino_blu <= 0) ? 0 : $bollino_blu; ?></label>
                         </div>
 
