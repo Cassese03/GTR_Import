@@ -1461,7 +1461,7 @@ class ClienteController extends Controller
         else
             $cd_cf = $cd_cf[0]->cd_cf;
 
-        $giacenze = DB::SELECT('SELECT if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato) as immediato,if(f.disponibile<=0,0,f.disponibile) as disponibile,if(f.giacenza<=0,0,f.giacenza) as giacenza,f.cd_ar,f.prezzo,f.descrizione,f.barcode,f.copertina FROM (
+        $giacenze = DB::SELECT('SELECT if(if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato) <= 0,0,if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato)) as immediato,if(f.disponibile<=0,0,f.disponibile) as disponibile,if(f.giacenza<=0,0,f.giacenza) as giacenza,f.cd_ar,f.prezzo,f.descrizione,f.barcode,f.copertina FROM (
                                         SELECT * from ftp_gtr WHERE id_lsrevisione = (SELECT MAX(id_lsrevisione) FROM lsrevisione WHERE cd_ls = (SELECT cf.cd_ls_1 from cf WHERE cf.id_ditta = 5 AND cd_cf = \'' . $cd_cf . '\') AND id_ditta = 5)
                                         ) f');
 
@@ -1470,7 +1470,7 @@ class ClienteController extends Controller
             foreach ($data as $row) {
                 $row2[] = array(strval($row->cd_ar), strval($row->giacenza), strval($row->disponibile), strval($row->immediato), strval($row->descrizione), strval($row->prezzo), strval($row->barcode), strval($row->copertina));
             }
-            return Excel::download(new ExcelExport($row2), 'ftp_' . $cd_cf . '.csv');
+            return Excel::download(new ExcelExport($row2), 'ftp.csv');
         }
 
     }
@@ -1487,7 +1487,7 @@ class ClienteController extends Controller
         else
             $cd_cf = $cd_cf[0]->cd_cf;
 
-        $giacenze = DB::SELECT('SELECT  if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato) as immediato,if(f.disponibile<=0,0,f.disponibile) as disponibile,if(f.giacenza<=0,0,f.giacenza) as giacenza ,f.cd_ar,f.prezzo,f.descrizione,f.barcode,f.copertina FROM (
+        $giacenze = DB::SELECT('SELECT if(if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato) <= 0,0,if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato)) as immediato,if(f.disponibile<=0,0,f.disponibile) as disponibile,if(f.giacenza<=0,0,f.giacenza) as giacenza ,f.cd_ar,f.prezzo,f.descrizione,f.barcode,f.copertina FROM (
                                         SELECT * from ftp_gtr WHERE id_lsrevisione = (SELECT MAX(id_lsrevisione) FROM lsrevisione WHERE cd_ls = (SELECT cf.cd_ls_1 from cf WHERE cf.id_ditta = 5 AND cd_cf = \'' . $cd_cf . '\') AND id_ditta = 5)
                                         ) f');
 
@@ -1496,7 +1496,7 @@ class ClienteController extends Controller
             foreach ($data as $row) {
                 $row2[] = array(strval($row->cd_ar), strval($row->giacenza), strval($row->disponibile), strval($row->immediato), strval($row->descrizione), strval($row->prezzo), strval($row->barcode), strval($row->copertina));
             }
-            return Excel::download(new ExcelExport($row2), 'ftp_' . $cd_cf . '.xlsx');
+            return Excel::download(new ExcelExport($row2), 'ftp.xlsx');
         }
 
     }
