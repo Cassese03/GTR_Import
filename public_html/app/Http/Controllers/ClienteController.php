@@ -650,10 +650,17 @@ class ClienteController extends Controller
             $disponibile = 0.00;
 
         $bollino_blu = DB::SELECT('SELECT if((Giacenza - Impegnato) > 0, Disponibile - Giacenza, Ordinato + (Giacenza - Impegnato)) as Disponibile FROM mggiacenza where cd_ar = \'' . $articolo->cd_ar . '\' and cd_mg = \'00001\' and id_ditta = \'' . $utente->id_ditta . '\' ');
-        if (sizeof($bollino_blu) > 0)
+        if (sizeof($bollino_blu) > 0) {
             $bollino_blu = $bollino_blu[0]->Disponibile;
-        else
+            $first_order = DB::SELECT('SELECT * FROM dotes WHERE dataconsegna > current_date() and tipodocumento = \'O\' AND cd_cf LIKE \'F%\' AND  id_ditta = 5 and id_dotes IN (SELECT id_dotes FROM dorig WHERE id_ditta = 5 AND cd_ar = \'' . $articolo->cd_ar . '\') ORDER BY id_dotes asc ');
+            if (sizeof($first_order) > 0)
+                $first_order = $first_order[0]->dataconsegna;
+            else
+                $first_order = '';
+        } else {
             $bollino_blu = 0.00;
+            $first_order = '';
+        }
 
         $immediato = DB::SELECT('SELECT (Giacenza - Impegnato) as Immediato FROM mggiacenza where cd_ar = \'' . $articolo->cd_ar . '\' and cd_mg = \'00001\' and id_ditta = \'' . $utente->id_ditta . '\' ');
         if (sizeof($immediato) > 0)
@@ -669,11 +676,12 @@ class ClienteController extends Controller
 
         $count_img = sizeof($immagine);
 
-        return View::make('admin.index', compact('page', 'articolo', 'prezzo', 'bollino_blu', 'immediato', 'simili', 'scheda_tec', 'scheda_web', 'utente', 'ordinato', 'giacenza', 'disponibile', 'immagine', 'ditta', 'count_img'));
+        return View::make('admin.index', compact('page', 'first_order', 'articolo', 'prezzo', 'bollino_blu', 'immediato', 'simili', 'scheda_tec', 'scheda_web', 'utente', 'ordinato', 'giacenza', 'disponibile', 'immagine', 'ditta', 'count_img'));
 
     }
 
-    public function torna_admin()
+    public
+    function torna_admin()
     {
 
         $this->is_loggato();
@@ -988,7 +996,8 @@ class ClienteController extends Controller
         }
     */
 
-    public function articoli(Request $request)
+    public
+    function articoli(Request $request)
     {
 
         $this->is_loggato();
@@ -1204,7 +1213,8 @@ class ClienteController extends Controller
 
      }*/
 
-    public function carrello(Request $request)
+    public
+    function carrello(Request $request)
     {
 
         $this->is_loggato();
@@ -1366,7 +1376,8 @@ class ClienteController extends Controller
         return View::make('admin.index', compact('page', 'cart', 'utente', 'ordine', 'max_disp'));
     }
 
-    public function ordini(Request $request)
+    public
+    function ordini(Request $request)
     {
 
         $this->is_loggato();
@@ -1378,7 +1389,8 @@ class ClienteController extends Controller
         return View::make('admin.index', compact('page', 'utente', 'ordini'));
     }
 
-    public function ftp(Request $request)
+    public
+    function ftp(Request $request)
     {
 
         $this->is_loggato();
@@ -1449,7 +1461,8 @@ class ClienteController extends Controller
         */
     }
 
-    public function csv_dedicato($token, Request $request)
+    public
+    function csv_dedicato($token, Request $request)
     {
 
         //$this->is_loggato();
@@ -1461,21 +1474,22 @@ class ClienteController extends Controller
         else
             $cd_cf = $cd_cf[0]->cd_cf;
 
-        $giacenze = DB::SELECT('SELECT if(if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato) <= 0,0,if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato)) as immediato,if(f.disponibile<=0,0,f.disponibile) as disponibile,if(f.giacenza<=0,0,f.giacenza) as giacenza,f.cd_ar,f.prezzo,f.descrizione,f.barcode,f.copertina FROM (
+        $giacenze = DB::SELECT('SELECT if(if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato) <= 0,0,if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato)) as immediato,if(f.disponibile<=0,0,f.disponibile) as disponibile,if(f.giacenza<=0,0,f.giacenza) as giacenza,f.cd_ar,f.prezzo,f.descrizione,f.barcode,f.copertina,f.first_ordine FROM (
                                         SELECT * from ftp_gtr WHERE id_lsrevisione = (SELECT MAX(id_lsrevisione) FROM lsrevisione WHERE cd_ls = (SELECT cf.cd_ls_1 from cf WHERE cf.id_ditta = 5 AND cd_cf = \'' . $cd_cf . '\') AND id_ditta = 5)
                                         ) f');
 
         if (sizeof($giacenze) > 0) {
             $data = $giacenze;
             foreach ($data as $row) {
-                $row2[] = array(strval($row->cd_ar), strval($row->giacenza), strval($row->disponibile), strval($row->immediato), strval($row->descrizione), strval($row->prezzo), strval($row->barcode), strval($row->copertina));
+                $row2[] = array(strval($row->cd_ar), strval($row->giacenza), strval($row->disponibile), strval($row->immediato), strval($row->descrizione), strval($row->prezzo), strval($row->barcode), strval($row->copertina), strval($row->first_ordine));
             }
             return Excel::download(new ExcelExport($row2), 'ftp.csv');
         }
 
     }
 
-    public function excel_dedicato($token, Request $request)
+    public
+    function excel_dedicato($token, Request $request)
     {
 
         //$this->is_loggato();
@@ -1487,14 +1501,14 @@ class ClienteController extends Controller
         else
             $cd_cf = $cd_cf[0]->cd_cf;
 
-        $giacenze = DB::SELECT('SELECT if(if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato) <= 0,0,if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato)) as immediato,if(f.disponibile<=0,0,f.disponibile) as disponibile,if(f.giacenza<=0,0,f.giacenza) as giacenza ,f.cd_ar,f.prezzo,f.descrizione,f.barcode,f.copertina FROM (
+        $giacenze = DB::SELECT('SELECT if(if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato) <= 0,0,if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato)) as immediato,if(f.disponibile<=0,0,f.disponibile) as disponibile,if(f.giacenza<=0,0,f.giacenza) as giacenza ,f.cd_ar,f.prezzo,f.descrizione,f.barcode,f.copertina,f.first_ordine FROM (
                                         SELECT * from ftp_gtr WHERE id_lsrevisione = (SELECT MAX(id_lsrevisione) FROM lsrevisione WHERE cd_ls = (SELECT cf.cd_ls_1 from cf WHERE cf.id_ditta = 5 AND cd_cf = \'' . $cd_cf . '\') AND id_ditta = 5)
                                         ) f');
 
         if (sizeof($giacenze) > 0) {
             $data = $giacenze;
             foreach ($data as $row) {
-                $row2[] = array(strval($row->cd_ar), strval($row->giacenza), strval($row->disponibile), strval($row->immediato), strval($row->descrizione), strval($row->prezzo), strval($row->barcode), strval($row->copertina));
+                $row2[] = array(strval($row->cd_ar), strval($row->giacenza), strval($row->disponibile), strval($row->immediato), strval($row->descrizione), strval($row->prezzo), strval($row->barcode), strval($row->copertina), strval($row->first_ordine));
             }
             return Excel::download(new ExcelExport($row2), 'ftp.xlsx');
         }
@@ -1631,8 +1645,9 @@ class ClienteController extends Controller
            return View::make('admin.index',compact('page','utente','materiali'));
 
        }
-   */
-    public function logout()
+    */
+    public
+    function logout()
     {
         $token = session('ditta');
         session()->flush();
@@ -1644,7 +1659,8 @@ class ClienteController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
 
-    public function is_loggato()
+    public
+    function is_loggato()
     {
         if (!session()->has('utente')) return Redirect::to('cliente/login')->send();
         //if (!session()->has('utente')) return Redirect::to('cliente/manutenzione')->send();

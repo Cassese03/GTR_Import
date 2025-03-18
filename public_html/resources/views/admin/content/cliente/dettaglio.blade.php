@@ -366,7 +366,8 @@
                                 <?php echo 'Merce in Arrivo'; ?>
                             </label>
                             <label style="color:black;font-weight: bold;<?php  if($bollino_blu > 0) echo ''; else echo 'display:none;';?>">
-                                : <?php echo ($bollino_blu <= 0) ? 0 : $bollino_blu; ?></label>
+                                : <?php echo ($bollino_blu <= 0) ? 0 : $bollino_blu; ?><?php echo (isset($first_order) && $first_order != '') ? '('.date('d-m-Y',strtotime($first_order)).')' : ''; ?></label>
+
                         </div>
 
                         <!--<div class="rating">

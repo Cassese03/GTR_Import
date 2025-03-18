@@ -8,6 +8,7 @@
         <th style="font-weight: bold;border:1px solid white;" colspan="1">Descrizione</th>
         <th style="font-weight: bold;border:1px solid white;" colspan="1">Prezzo</th>
         <th style="font-weight: bold;border:1px solid white;" colspan="1">Barcode</th>
+        <th style="font-weight: bold;border:1px solid white;" colspan="1">Data Primo Ordine</th>
     </tr>
     </thead>
     <tbody>
@@ -22,6 +23,7 @@
         <td colspan="1" style="border:1px solid white;"><?php echo $r['4']; ?></td>
         <td colspan="1" style="border:1px solid white;"><?php echo $r['5']; ?></td>
         <td colspan="1" style="border:1px solid white;"><?php echo $r['6']; ?></td>
+        <td colspan="1" style="border:1px solid white;"><?php echo $r['7']; ?></td>
     </tr>
     <?php } ?>
 
