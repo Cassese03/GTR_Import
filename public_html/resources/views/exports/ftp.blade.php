@@ -23,7 +23,7 @@
         <td colspan="1" style="border:1px solid white;"><?php echo $r['4']; ?></td>
         <td colspan="1" style="border:1px solid white;"><?php echo $r['5']; ?></td>
         <td colspan="1" style="border:1px solid white;"><?php echo $r['6']; ?></td>
-        <td colspan="1" style="border:1px solid white;"><?php echo $r['7']; ?></td>
+        <td colspan="1" style="border:1px solid white;"><?php echo $r['8']; ?></td>
     </tr>
     <?php } ?>
 
