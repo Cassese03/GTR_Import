@@ -575,6 +575,10 @@ class ClienteController extends Controller
                     $dati['quantita'] = $dati['quantita'] + $cart[$prodotti[0]->id]['quantita'];
                 }
                 $img = DB::SELECT('SELECT link from arimg where id_ditta = \'' . $utente->id_ditta . '\' and cd_ar = \'' . $prodotti[0]->cd_ar . '\'');
+
+                if ($dati['quantita'] == 0)
+                    return Redirect::to('/cliente/dettaglio/' . $prodotti[0]->id_ar . '?errore=Impossibile Inserire Quantità 0');
+
                 $cart[$prodotti[0]->id] = array(
                     "id" => $prodotti[0]->id,
                     "nome" => $prodotti[0]->cd_ar,
@@ -596,7 +600,7 @@ class ClienteController extends Controller
 
         $page = 'cliente.dettaglio';
 
-        $articolo = DB::SELECT('SELECT *, (SELECT alias from aralias where cd_ar = ar.cd_ar and id_ditta = ' . $utente->id_ditta . ' LIMIT 1) as barcode FROM ar where id_ditta = ' . $utente->id_ditta . ' and id_ar = \'' . $articolo . '\' ');
+        $articolo = DB::SELECT('SELECT ar.*, COALESCE(mggiacenza.disponibile,0.00) as disponibile, (SELECT alias from aralias where cd_ar = ar.cd_ar and id_ditta = ' . $utente->id_ditta . ' LIMIT 1) as barcode FROM ar left join mggiacenza on mggiacenza.cd_ar = ar.cd_ar and mggiacenza.id_ditta = ' . $utente->id_ditta . ' where ar.id_ditta = ' . $utente->id_ditta . ' and ar.id_ar = \'' . $articolo . '\' ');
 
         if (sizeof($articolo) > 0)
             $articolo = $articolo[0];
@@ -1005,7 +1009,6 @@ class ClienteController extends Controller
         $utente = session('utente');
 
         if (isset($dati['aggiungi_al_carrello'])) {
-
             if (isset($dati['id_prodotto'])) {
 
                 if (isset($dati['pagina'])) {
@@ -1474,7 +1477,7 @@ class ClienteController extends Controller
         else
             $cd_cf = $cd_cf[0]->cd_cf;
 
-        $giacenze = DB::SELECT('SELECT if(if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato) <= 0,0,if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato)) as immediato,if(f.disponibile<=0,0,f.disponibile) as disponibile,if(f.giacenza<=0,0,f.giacenza) as giacenza,f.cd_ar,f.prezzo,f.descrizione,f.barcode,f.copertina,f.first_ordine FROM (
+        $giacenze = DB::SELECT('SELECT if(if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato) <= 0,0,if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato)) as immediato,if(if(f.disponibile<=0,0,f.disponibile)-if(if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato) <= 0,0,if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato)) <= 0,0,if(f.disponibile<=0,0,f.disponibile)-if(if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato) <= 0,0,if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato))) as disponibile,if(f.giacenza<=0,0,f.giacenza) as giacenza ,f.cd_ar,f.prezzo,f.descrizione,f.barcode,f.copertina,f.first_ordine FROM (
                                         SELECT * from ftp_gtr WHERE id_lsrevisione = (SELECT MAX(id_lsrevisione) FROM lsrevisione WHERE cd_ls = (SELECT cf.cd_ls_1 from cf WHERE cf.id_ditta = 5 AND cd_cf = \'' . $cd_cf . '\') AND id_ditta = 5)
                                         ) f');
 
@@ -1501,7 +1504,7 @@ class ClienteController extends Controller
         else
             $cd_cf = $cd_cf[0]->cd_cf;
 
-        $giacenze = DB::SELECT('SELECT if(if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato) <= 0,0,if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato)) as immediato,if(f.disponibile<=0,0,f.disponibile) as disponibile,if(f.giacenza<=0,0,f.giacenza) as giacenza ,f.cd_ar,f.prezzo,f.descrizione,f.barcode,f.copertina,f.first_ordine FROM (
+        $giacenze = DB::SELECT('SELECT if(if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato) <= 0,0,if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato)) as immediato,if(if(f.disponibile<=0,0,f.disponibile)-if(if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato) <= 0,0,if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato)) <= 0,0,if(f.disponibile<=0,0,f.disponibile)-if(if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato) <= 0,0,if(f.disponibile<=0,0,f.disponibile)-if(f.ordinato<=0,0,f.ordinato))) as disponibile,if(f.giacenza<=0,0,f.giacenza) as giacenza ,f.cd_ar,f.prezzo,f.descrizione,f.barcode,f.copertina,f.first_ordine FROM (
                                         SELECT * from ftp_gtr WHERE id_lsrevisione = (SELECT MAX(id_lsrevisione) FROM lsrevisione WHERE cd_ls = (SELECT cf.cd_ls_1 from cf WHERE cf.id_ditta = 5 AND cd_cf = \'' . $cd_cf . '\') AND id_ditta = 5)
                                         ) f');
 

@@ -793,7 +793,7 @@ class AjaxController extends Controller
                                         ?>></div>
                                         <h7><?php echo $a->cd_ar ?></h7>
                                         <div class="red"
-                                             style="<?php if ($a->bollino_blu > 0) echo 'background: blue'; else echo 'display:none;'; ?>"></div>
+                                             style="<?php if ($a->bollino_blu > 0 && $a->immediato < 16) echo 'background: blue'; else echo 'display:none;'; ?>"></div>
                                     </div>
                                     <h6><?php echo $a->descrizione ?></h6>
                                     <!--<div class="rating">

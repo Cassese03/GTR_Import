@@ -366,7 +366,7 @@
                                 <?php echo 'Merce in Arrivo'; ?>
                             </label>
                             <label style="color:black;font-weight: bold;<?php  if($bollino_blu > 0) echo ''; else echo 'display:none;';?>">
-                                : <?php echo ($bollino_blu <= 0) ? 0 : $bollino_blu; ?><?php echo (isset($first_order) && $first_order != '') ? '('.date('d-m-Y',strtotime($first_order)).')' : ''; ?></label>
+                                : <?php echo ($bollino_blu <= 0) ? 0 : $bollino_blu; ?><?php echo (isset($first_order) && $first_order != '') ? '(' . date('d-m-Y', strtotime($first_order)) . ')' : ''; ?></label>
 
                         </div>
 
@@ -437,7 +437,7 @@
                                         <strong id="ciao"><?php echo ($immediato > number_format($articolo->xqtaconf, 0)) ? (number_format($articolo->xqtaconf, 0) != '0.00') ? number_format($articolo->xqtaconf, 0) : '1' : '0' ?></strong>
                                     </button>
                                     <button type="button" style="border:none;margin: 10px;background: transparent"
-                                            onclick="aggiungi()">
+                                            onclick="aggiungi('<?php echo $articolo->id ?>','<?php echo ($articolo->xqtaconf != '0.00') ? intval($articolo->xqtaconf) : '1' ?>','<?php echo $articolo->disponibile ?>')">
                                         <i class="fa fa-solid fa-plus" style="background-color:white;border:none"></i>
                                     </button>
 
@@ -657,7 +657,24 @@
         </div>
     </div>
 </div>
-
+<div id="myError" class="modal fade">
+    <div class="modal-dialog modal-confirm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="icon-box" style="background-color: red">
+                    <i class="fa fa-solid fa-times"></i>
+                </div>
+                <h4 class="modal-title w-100">Errore!</h4>
+            </div>
+            <div class="modal-body">
+                <p class="text-center"><?php if (isset($_GET['errore'])){ echo $_GET['errore'];} else {echo 'Errore Generico';}?></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success btn-block" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- ./wrapper -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <!-- jQuery -->
@@ -668,6 +685,10 @@
         <?php if (isset($_GET['aggiunto'])){ ?>
         $('#myModal').modal('show');
         <?php } ?>
+        <?php if (isset($_GET['errore'])){ ?>
+        $('#myError').modal('show');
+        <?php } ?>
+
     })
 
     function rimuovi_attributo(new_attivo) {
@@ -713,12 +734,31 @@
 
     }
 
-    function aggiungi() {
+    function aggiungi(id, xqtaconf, disponibile) {
         quantita = document.getElementById('quantita').value;
-        if (parseInt(quantita) + parseInt(<?php echo (number_format($articolo->xqtaconf, 0)) ? number_format($articolo->xqtaconf, 0) : 1 ?>) <= '<?php echo $immediato; ?>') {
-            document.getElementById('quantita').value = parseInt(quantita) + parseInt(<?php echo (number_format($articolo->xqtaconf, 0)) ? number_format($articolo->xqtaconf, 0) : 1 ?>);
-            document.getElementById('ciao').innerHTML = document.getElementById('quantita').value;
-        } else
+        check_xqtaconf = parseFloat(parseFloat(quantita) / parseFloat(xqtaconf));
+        if ((check_xqtaconf % 1) === 0) {
+            quantita = parseInt(quantita) + parseInt(xqtaconf);
+        } else {
+            quantita = parseInt(parseInt(check_xqtaconf) * xqtaconf) + parseInt(xqtaconf);
+        }
+
+        if (quantita <= disponibile) {
+            document.getElementById('quantita').value = quantita;
+            document.getElementById('ciao').innerHTML = quantita;
+        } else {
+            if (disponibile > 0) {
+                document.getElementById('ciao').innerHTML = quantita;
+
+                document.getElementById('quantita').value = disponibile;
+            } else {
+                document.getElementById('quantita').value = 0;
+                document.getElementById('ciao').innerHTML = quantita;
+
+            }
             $('#max_disp').modal('show');
+        }
+
+
     }
 </script>
