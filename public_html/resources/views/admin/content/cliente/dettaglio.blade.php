@@ -362,7 +362,6 @@
                  <?php  if($bollino_blu > 0) echo 'background: blue'; else echo 'display:none;';?>">
                                 <br></div>
                             <label style="color:black;font-weight: bold;<?php  if($bollino_blu > 0) echo ''; else echo 'display:none;';?>">
-                                <!-- DISPONIBILE MA NON IMMEDIATA -->
                                 <?php echo 'Merce in Arrivo'; ?>
                             </label>
                             <label style="color:black;font-weight: bold;<?php  if($bollino_blu > 0) echo ''; else echo 'display:none;';?>">
@@ -599,11 +598,11 @@
                         </div>
                         <div class="product__item__text" style="text-align: center">
                             <h6><?php echo $s->descrizione ?></h6>
-                            <button type="submit" style="visibility: hidden!important;top: 22px!important;"
+                            {{--<button type="submit" style="visibility: hidden!important;top: 22px!important;"
                                     value="<?php echo ($immediato > $s->xqtaconf) ? ($s->xqtaconf != '0.00') ? intval($s->xqtaconf) : '1' : '0'?>"
                                     name="aggiungi_al_carrello">
                                 <a class="add-cart">+ Aggiungi al Carrello</a>
-                            </button>
+                            </button>--}}
                             <input type="hidden" value="<?php echo $s->id ?>" name="id_prodotto" id="id_prodotto">
                             <input type="hidden" value="1" name="quantita" id="quantita">
                             <input type="hidden"
@@ -730,6 +729,8 @@
         quantita = document.getElementById('quantita').value;
         if (quantita > <?php echo (number_format($articolo->xqtaconf, 0)) ? number_format($articolo->xqtaconf, 0) : 1 ?>)
             document.getElementById('quantita').value = parseInt(quantita) - parseInt(<?php echo (number_format($articolo->xqtaconf, 0)) ? number_format($articolo->xqtaconf, 0) : 1 ?>);
+        else
+            document.getElementById('quantita').value = 0;
         document.getElementById('ciao').innerHTML = document.getElementById('quantita').value;
 
     }
@@ -748,9 +749,9 @@
             document.getElementById('ciao').innerHTML = quantita;
         } else {
             if (disponibile > 0) {
-                document.getElementById('ciao').innerHTML = quantita;
+                document.getElementById('ciao').innerHTML = parseInt(disponibile);
 
-                document.getElementById('quantita').value = disponibile;
+                document.getElementById('quantita').value = parseInt(disponibile);
             } else {
                 document.getElementById('quantita').value = 0;
                 document.getElementById('ciao').innerHTML = quantita;

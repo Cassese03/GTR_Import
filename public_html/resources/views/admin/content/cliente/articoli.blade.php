@@ -309,6 +309,25 @@
     </div>
 </div>
 
+<div id="myModalZero" class="modal fade">
+    <div class="modal-dialog modal-confirm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="icon-box" style="background-color: red">
+                    <i class="fa fa-solid fa-times"></i>
+                </div>
+                <h4 class="modal-title w-100">Errore!</h4>
+            </div>
+            <div class="modal-body">
+                <p class="text-center">Impossibile aggiungere al carrello con Quantità a 0.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-success btn-block" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="myError" class="modal fade">
     <div class="modal-dialog modal-confirm">
         <div class="modal-content">
@@ -477,7 +496,10 @@
         $.ajax({
             url: "<?php echo URL::asset('ajax/aggiungi_al_carrello') ?>/" + cd_ar + "/" + quantita + "/" + pagina + "/" + sconto + "/" + prezzo
         }).done(function (result) {
-            $('#myModal').modal('show');
+            if(quantita > 0)
+                $('#myModal').modal('show');
+            else
+                $('#myModalZero').modal('show');
             check_cart();
         });
 
