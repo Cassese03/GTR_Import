@@ -52,7 +52,7 @@ class AjaxController extends Controller
     {
 
         $utente = session('utente');
-
+        if($quantita <= 0) return;
         $prodotti = DB::select('SELECT * from ar where id_ditta = \'' . $utente->id_ditta . '\' and cd_ar = \'' . str_replace('slash', '/', $cd_ar) . '\'');
 
         $cart = Session::get('cart');
