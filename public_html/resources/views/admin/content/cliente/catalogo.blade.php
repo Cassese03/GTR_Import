@@ -31,12 +31,12 @@
 </style>
 <div class="row" style="padding-top: 6em;">
     <div class="grid-item col-xl-3 col-md-3 col-sm-12"
-         onclick="window.open('https://heyzine.com/flip-book/9dd2f9ef3a.html');">
-        <div class="product__item__pic set-bg" data-setbg="/img/GTR1234/copertina_outdoor2024.jpg"
+         onclick="window.open('https://heyzine.com/flip-book/b5bca148b0.html');">
+        <div class="product__item__pic set-bg" data-setbg="/img/GTR1234/copertina_outdoor2025.jpg"
              style="background-image: url('/img/GTR1234/copertina-commercial-items-2023.jpg');background-size:contain!important">
         </div>
         <br>
-        <a style="font-size:0.75em" class="breadcrumb__text"> CATALOGO GTR OUTDOOR 2024</a>
+        <a style="font-size:0.75em" class="breadcrumb__text"> CATALOGO GTR OUTDOOR 2025</a>
     </div>
     {{--<div class="grid-item col-xl-3 col-md-3 col-sm-12"
          onclick="window.open('https://heyzine.com/flip-book/887ce21be4.html');">
